@@ -8,19 +8,17 @@ class PolyTreeNode
     attr_reader :parent, :children, :value
 
     def parent=(p_node)
-        return true if @parent == p_node
-        if p_node == nil
-            @parent.children.delete(self)
-            @parent = p_node
+        return if @parent == p_node
+        
+        unless p_node == nil
+            p_node.children << self
         end
-        if @parent == nil
-            @parent = p_node
-            p_node.children << self 
-        else 
+
+        unless @parent == nil
             @parent.children.delete(self)
-            @parent = p_node
-            p_node.children << self 
         end
+
+        @parent = p_node
     end
 
     def add_child(child_node)
@@ -34,6 +32,25 @@ class PolyTreeNode
 
     def dfs(target)
         return self if self.value == target
-        
+
+        self.children.each do |child|
+            temp = child.dfs(target)
+            return temp unless temp == nil
+        end
+
+        nil
+    end
+
+    def bfs(target)
+        return self if self.value == target
+
+        nodes_queue = [self]
+        until nodes_queue.empty?
+            current_node = nodes_queue.shift
+            return current_node if current_node.value == target
+            nodes_queue += current_node.children
+        end
+
+        nil
     end
 end
